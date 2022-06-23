@@ -33,9 +33,6 @@ CPPFLAGS := -DTARGET_ARCH="$(TARGET_ARCH_ABI)"
 # example: EVAL_NNUE_HALFKP_256x2_32_32 (2018 T.N.K.)
 # $ ndk-build YANEURAOU_EDITION=YANEURAOU_ENGINE_NNUE
 
-# example: EVAL_NNUE_HALFKP_VM_256X2_32_32
-# $ ndk-build YANEURAOU_EDITION=YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32
-
 # example: EVAL_NNUE_HALFKPE9_256x2_32_32
 # $ ndk-build YANEURAOU_EDITION=YANEURAOU_ENGINE_NNUE_HALFKPE9
 
@@ -46,7 +43,6 @@ CPPFLAGS := -DTARGET_ARCH="$(TARGET_ARCH_ABI)"
 # $ ndk-build YANEURAOU_EDITION=MATE_ENGINE
 
 YANEURAOU_EDITION := YANEURAOU_ENGINE_NNUE
-#YANEURAOU_EDITION := YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32
 #YANEURAOU_EDITION := YANEURAOU_ENGINE_NNUE_HALFKPE9
 #YANEURAOU_EDITION := YANEURAOU_ENGINE_NNUE_KP256
 #YANEURAOU_EDITION := YANEURAOU_ENGINE_KPPT
@@ -54,10 +50,6 @@ YANEURAOU_EDITION := YANEURAOU_ENGINE_NNUE
 #YANEURAOU_EDITION := YANEURAOU_ENGINE_MATERIAL
 #YANEURAOU_EDITION := MATE_ENGINE
 #YANEURAOU_EDITION := USER_ENGINE
-
-# やねうら王のcluster機能を使いたいなら、これもdefineする。(define if you want to use YO-cluster)
-YO_CLUSTER = OFF
-#YO_CLUSTER = ON
 
 # エンジンの表示名 (engine displayname)
 # ("usi"コマンドに対して出力される)
@@ -75,13 +67,7 @@ EXTRA_CPPFLAGS =
 # 001 : 普通の駒得のみの評価関数
 # 002 : …
 # cf.【連載】評価関数を作ってみよう！その1 : http://yaneuraou.yaneu.com/2020/11/17/make-evaluate-function/
-MATERIAL_LEVEL = 1
-
-# NNUE評価関数を実行ファイルに内蔵する。 `eval/nnue/embedded_nnue.cpp` が別途必要。
-EVAL_EMBEDDING = OFF
-# EVAL_EMBEDDING = ON
-
-CPPFLAGS += $(EXTRA_CPPFLAGS)
+MATERIAL_LEVEL = 001
 
 ifeq ($(YANEURAOU_EDITION),YANEURAOU_ENGINE_KPPT)
   CPPFLAGS += -DUSE_MAKEFILE -DYANEURAOU_ENGINE_KPPT
@@ -93,9 +79,9 @@ ifeq ($(YANEURAOU_EDITION),YANEURAOU_ENGINE_KPP_KKPT)
   ENGINE_NAME := YaneuraOu_KPP_KKPT
 endif
 
-ifeq ($(findstring YANEURAOU_ENGINE_MATERIAL,$(YANEURAOU_EDITION)),YANEURAOU_ENGINE_MATERIAL)
+ifeq ($(YANEURAOU_EDITION),YANEURAOU_ENGINE_MATERIAL)
   CPPFLAGS += -DUSE_MAKEFILE -DYANEURAOU_ENGINE_MATERIAL
-  ENGINE_NAME := YaneuraOu_MaterialLv$(MATERIAL_LEVEL)
+  ENGINE_NAME := YaneuraOu_MaterialLv1
 endif
 
 ifeq ($(findstring YANEURAOU_ENGINE_NNUE,$(YANEURAOU_EDITION)),YANEURAOU_ENGINE_NNUE)
@@ -119,24 +105,10 @@ ifeq ($(findstring YANEURAOU_ENGINE_NNUE,$(YANEURAOU_EDITION)),YANEURAOU_ENGINE_
       CPPFLAGS += -DEVAL_NNUE_HALFKPE9
     endif
   endif
-  ifeq ($(YANEURAOU_EDITION),YANEURAOU_ENGINE_NNUE_HALFKPE9)
-    ENGINE_NAME := YaneuraOu_NNUE_HALFKP_VM
-    CPPFLAGS += -DEVAL_NNUE_HALFKP_VM_256X2_32_32
-  else
-    ifeq ($(NNUE_EVAL_ARCH),EVAL_NNUE_HALFKP_VM_256X2_32_32)
-      ENGINE_NAME := YaneuraOu_NNUE_HALFKP_VM
-      CPPFLAGS += -DEVAL_NNUE_HALFKP_VM_256X2_32_32
-    endif
-  endif
 endif
 
-ifeq ($(YANEURAOU_EDITION),YANEURAOU_MATE_ENGINE)
-  CPPFLAGS += -DUSE_MAKEFILE -DYANEURAOU_MATE_ENGINE
-  ENGINE_NAME := YaneuraOu_MATE
-endif
-
-ifeq ($(YANEURAOU_EDITION),TANUKI_MATE_ENGINE)
-  CPPFLAGS += -DUSE_MAKEFILE -DTANUKI_MATE_ENGINE
+ifeq ($(YANEURAOU_EDITION),MATE_ENGINE)
+  CPPFLAGS += -DUSE_MAKEFILE -DMATE_ENGINE
   ENGINE_NAME := tanuki_MATE
 endif
 
@@ -176,25 +148,25 @@ LOCAL_SRC_FILES := \
   ../source/tt.cpp                                                     \
   ../source/movepick.cpp                                               \
   ../source/timeman.cpp                                                \
-  ../source/book/apery_book.cpp                                        \
-  ../source/book/book.cpp                                              \
+  ../source/benchmark.cpp                                              \
+  ../source/extra/book/apery_book.cpp                                  \
+  ../source/extra/book/book.cpp                                        \
+  ../source/extra/book/makebook2019.cpp                                \
   ../source/extra/bitop.cpp                                            \
   ../source/extra/long_effect.cpp                                      \
+  ../source/extra/mate/mate1ply_with_effect.cpp                        \
+  ../source/extra/mate/mate1ply_without_effect.cpp                     \
+  ../source/extra/mate/mate_n_ply.cpp                                  \
+  ../source/extra/test_cmd.cpp                                         \
   ../source/extra/sfen_packer.cpp                                      \
-  ../source/extra/super_sort.cpp                                       \
-  ../source/mate/mate.cpp                                              \
-  ../source/mate/mate1ply_without_effect.cpp                           \
-  ../source/mate/mate1ply_with_effect.cpp                              \
-  ../source/mate/mate_solver.cpp                                       \
+  ../source/extra/kif_converter/kif_convert_tools.cpp                  \
   ../source/eval/evaluate_bona_piece.cpp                               \
   ../source/eval/evaluate.cpp                                          \
   ../source/eval/evaluate_io.cpp                                       \
   ../source/eval/evaluate_mir_inv_tools.cpp                            \
-  ../source/eval/material/evaluate_material.cpp                        \
-  ../source/testcmd/benchmark.cpp                                      \
-  ../source/testcmd/mate_test_cmd.cpp                                  \
-  ../source/testcmd/normal_test_cmd.cpp                                \
-  ../source/testcmd/unit_test.cpp
+  ../source/learn/learner.cpp                                          \
+  ../source/learn/learning_tools.cpp                                   \
+  ../source/learn/multi_think.cpp
 
 ifeq ($(YANEURAOU_EDITION),YANEURAOU_ENGINE_KPPT)
 LOCAL_SRC_FILES += \
@@ -213,7 +185,8 @@ endif
 
 ifeq ($(YANEURAOU_EDITION),YANEURAOU_ENGINE_MATERIAL)
 LOCAL_SRC_FILES += \
-  ../source/engine/yaneuraou-engine/yaneuraou-search.cpp
+  ../source/engine/yaneuraou-engine/yaneuraou-search.cpp               \
+  ../source/eval/material/evaluate_material.cpp
 
 CPPFLAGS += -DMATERIAL_LEVEL=$(MATERIAL_LEVEL)
 endif
@@ -226,53 +199,40 @@ LOCAL_SRC_FILES += \
   ../source/eval/nnue/features/k.cpp                                   \
   ../source/eval/nnue/features/p.cpp                                   \
   ../source/eval/nnue/features/half_kp.cpp                             \
-  ../source/eval/nnue/features/half_kp_vm.cpp                          \
   ../source/eval/nnue/features/half_relative_kp.cpp                    \
   ../source/eval/nnue/features/half_kpe9.cpp                           \
   ../source/eval/nnue/features/pe9.cpp                                 \
   ../source/engine/yaneuraou-engine/yaneuraou-search.cpp
-	ifeq ($(EVAL_EMBEDDING),ON)
-		LOCAL_SRC_FILES += \
-			../source/eval/nnue/embedded_nnue.cpp
-		CPPFLAGS += -DEVAL_EMBEDDING
-	endif
 endif
 
-ifeq ($(YANEURAOU_EDITION),TANUKI_MATE_ENGINE)
+ifeq ($(YANEURAOU_EDITION),MATE_ENGINE)
 LOCAL_SRC_FILES += \
-  ../source/engine/tanuki-mate-engine/tanuki-mate-search.cpp
-endif
-
-ifeq ($(YANEURAOU_EDITION),YANEURAOU_MATE_ENGINE)
-LOCAL_SRC_FILES += \
-  ../source/engine/yaneuraou-mate-engine/yaneuraou-mate-search.cpp
+  ../source/engine/mate-engine/mate-search.cpp                         \
+  ../source/eval/material/evaluate_material.cpp
 endif
 
 ifeq ($(YANEURAOU_EDITION),USER_ENGINE)
 LOCAL_SRC_FILES += \
-  ../source/engine/user-engine/user-search.cpp
+  ../source/engine/user-engine/user-search.cpp                         \
+  ../source/eval/material/evaluate_material.cpp
 endif
 
 ifneq ($(ENGINE_NAME),)
 CPPFLAGS += -DENGINE_NAME_FROM_MAKEFILE=$(ENGINE_NAME)
 endif
 
-# cluster
-ifeq ($(YO_CLUSTER),ON)
-	LOCAL_SRC_FILES += \
-		../source/engine/yo-cluster/ProcessNegotiator.cpp                  \
-		../source/engine/yo-cluster/yo_cluster.cpp
-	CPPFLAGS += -DUSE_YO_CLUSTER
-endif
-
 # 開発用branch
 ifeq ($(findstring dev,$(ENGINE_BRANCH)),dev)
 CPPFLAGS += -DDEV_BRANCH
+LOCAL_SRC_FILES += \
+  ../source/extra/super_sort.cpp
 endif
 
 # abe
 ifeq ($(findstring abe,$(ENGINE_BRANCH)),abe)
-CPPFLAGS += -DPV_OUTPUT_DRAW_ONLY -DFORCE_BIND_THIS_THREAD
+CPPFLAGS += -DPV_OUTPUT_DRAW_ONLY
+LOCAL_SRC_FILES += \
+  ../source/extra/super_sort.cpp
 endif
 
 

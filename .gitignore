@@ -2,3 +2,9 @@ __pycache__/
 env/
 build/
 logs/
+nnue-pytorch/nnue-pytorch/x64
+nnue-pytorch/x64
+.vs/
+*.vcxproj.user
+*.so
+*.dll

@@ -14,39 +14,32 @@
 
 #include <memory>
 
-#if defined(EVAL_EMBEDDING)
-	extern const char*  gEmbeddedNNUEData;
-	extern const size_t gEmbeddedNNUESize;
-#else
-	const char   gEmbeddedNNUEData[1] = {0x0};
-	const size_t gEmbeddedNNUESize = 1;
-#endif
-
 namespace Eval::NNUE {
 
 	// Hash value of evaluation function structure
 	// 評価関数の構造のハッシュ値
 	constexpr std::uint32_t kHashValue =
-	    FeatureTransformer::GetHashValue() ^ Network::GetHashValue();
+    FeatureTransformer::GetHashValue() ^ Network::GetHashValue();
 
 	// Deleter for automating release of memory area
 	// メモリ領域の解放を自動化するためのデリータ
 	template <typename T>
-	struct LargeMemoryDeleter {
+	struct AlignedDeleter {
 
-	    void operator()(T* ptr) const {
+    void operator()(T* ptr) const {
 
-	        // Tクラスのデストラクタ
-	        ptr->~T();
+        // Tクラスのデストラクタ
+        ptr->~T();
 
-			// このメモリはLargeMemoryクラスを利用して確保したものなので、
-			// このクラスのfree()を呼び出して開放する。
-	        LargeMemory::static_free(ptr);
-	    }
+        LargeMemory::static_free(mem);
+    }
+
+    // operator()で開放すべきメモリ(LargeMemory::static_alloc()で確保するときの引数に指定したmem)
+    void* mem = nullptr;
 	};
 
 	template <typename T>
-	using AlignedPtr = std::unique_ptr<T, LargeMemoryDeleter<T>>;
+	using AlignedPtr = std::unique_ptr<T, AlignedDeleter<T>>;
 
 	// 入力特徴量変換器
 	extern AlignedPtr<FeatureTransformer> feature_transformer;
@@ -62,11 +55,11 @@ namespace Eval::NNUE {
 
 	// ヘッダを読み込む
 	bool ReadHeader(std::istream& stream,
-	    std::uint32_t* hash_value, std::string* architecture);
+    std::uint32_t* hash_value, std::string* architecture);
 
 	// ヘッダを書き込む
 	bool WriteHeader(std::ostream& stream,
-	    std::uint32_t hash_value, const std::string& architecture);
+    std::uint32_t hash_value, const std::string& architecture);
 
 	// 評価関数パラメータを読み込む
 	bool ReadParameters(std::istream& stream);

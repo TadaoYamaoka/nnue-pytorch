@@ -10,10 +10,6 @@
 
 #if defined(EVAL_NNUE)
 
-#if defined(USE_WASM_SIMD)
-#include "./wasm_simd.h"
-#endif
-
 // HACK: Use _mm256_loadu_si256() instead of _mm256_load_si256. Otherwise a binary
 //       compiled with older g++ crashes because the output memory is not aligned
 //       even though alignas is specified.
@@ -52,8 +48,7 @@ namespace Eval::NNUE {
 
   // Constant used in evaluation value calculation
   // 評価値の計算で利用する定数
-  extern int FV_SCALE; // default 16。水匠5では24がベストらしいのでエンジンオプション"FV_SCALE"で変更可能にした。
-
+  constexpr int FV_SCALE = 16;
   constexpr int kWeightScaleBits = 6;
 
   // Size of cache line (in bytes)
@@ -70,8 +65,6 @@ namespace Eval::NNUE {
   constexpr std::size_t kSimdWidth = 8;
 
   #elif defined(USE_NEON)
-  constexpr std::size_t kSimdWidth = 16;
-  #elif defined(USE_WASM_SIMD)
   constexpr std::size_t kSimdWidth = 16;
   #endif
   constexpr std::size_t kMaxSimdWidth = 32;
@@ -115,7 +108,7 @@ namespace Eval::NNUE {
   // n以上で最小のbaseの倍数を求める
   template <typename IntType>
   constexpr IntType CeilToMultiple(IntType n, IntType base) {
-    return (n + base - 1) / base * base;
+  return (n + base - 1) / base * base;
   }
 
   // read_little_endian() is our utility to read an integer (signed or unsigned, any size)

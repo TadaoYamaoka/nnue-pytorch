@@ -9,6 +9,7 @@
 #include <deque>
 #include <random>
 
+#include "YaneuraOu/source/types.h"
 #include "YaneuraOu/source/config.h"
 #include "YaneuraOu/source/usi.h"
 
@@ -634,7 +635,7 @@ extern "C" {
 
 int main()
 {
-    auto stream = create_sparse_batch_stream("HalfKP^", 4, R"(C:\shogi\training_data\suisho5.shuffled.qsearch\shuffled.bin)", 8192, true, false, 0);
+    auto stream = create_sparse_batch_stream("HalfKP^", 4, R"(F:\floodgate\floodgate_test_2017-2018_r3500_eval5000.psv.bin)", 8192, true, false, 0);
     auto t0 = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < 1000; ++i)
     {

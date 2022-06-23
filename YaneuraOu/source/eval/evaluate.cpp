@@ -6,19 +6,6 @@
 
 namespace Eval
 {
-#if !defined(USE_EVAL)
-	// 評価関数を用いない時用に、ここでダミーの評価関数を定義しておく。
-
-	void init() {}
-	Value compute_eval(const Position& pos) { return VALUE_ZERO; }
-	void evaluate_with_no_return(const Position& pos) {}
-	void print_eval_stat(Position& pos) {}
-	void load_eval() {}
-	Value evaluate(const Position& pos) { return VALUE_ZERO; }
-
-#endif
-
-#if defined(USE_PIECE_VALUE)
 	// 何らかの評価関数を用いる以上、駒割りの計算は必須。
 	// 評価関数を一切呼び出さないならこの計算は要らないが、
 	// 実行時のオーバーヘッドは小さいので、そこまで考慮することもなさげ。
@@ -39,7 +26,6 @@ namespace Eval
 
 		return (Value)v;
 	}
-#endif
 
 #if defined(EVAL_KPPT) || defined(EVAL_KPP_KKPT)
 
@@ -95,7 +81,6 @@ namespace Eval
 	}
 #endif
 
-#if defined(USE_EVAL_LIST)
 	// 内部で保持しているpieceListFb[]が正しいBonaPieceであるかを検査する。
 	// 注 : デバッグ用。遅い。
 	bool EvalList::is_valid(const Position& pos)
@@ -139,7 +124,7 @@ namespace Eval
 				for (Piece pc = NO_PIECE; pc < PIECE_NB; ++pc)
 				{
 					PieceType pt = type_of(pc);
-					if (pt == NO_PIECE_TYPE || pt == GOLDS) // 存在しない駒
+					if (pt == NO_PIECE_TYPE || pt == QUEEN) // 存在しない駒
 						continue;
 
 					// 駒pcのBonaPieceの開始番号
@@ -170,6 +155,6 @@ namespace Eval
 
 		return true;
 	}
-#endif
+
 
 } // namespace Eval

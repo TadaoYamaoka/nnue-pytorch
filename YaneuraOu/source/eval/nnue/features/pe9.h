@@ -5,7 +5,7 @@
 
 #include "../../../config.h"
 
-#if defined(EVAL_NNUE) && defined(LONG_EFFECT_LIBRARY) && defined(USE_BOARD_EFFECT_PREV)
+#if defined(EVAL_NNUE)
 
 #include "../../../evaluate.h"
 #include "features_common.h"

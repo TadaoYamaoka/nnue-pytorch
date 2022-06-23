@@ -73,8 +73,8 @@ namespace EvalIO
 				// file to memory
 				else if (in_.file_or_memory.file() && out_.file_or_memory.memory())
 				{
-					if (SystemIO::ReadFileToMemory(in_.file_or_memory.filename, [&](size_t size) {
-						if ((u64)size != input_block_size)
+					if (FileOperator::ReadFileToMemory(in_.file_or_memory.filename, [&](u64 size) {
+						if (size != input_block_size)
 						{
 							std::cout << "info string Error! : file size incorrect , file = " << in_.file_or_memory.filename
 								<< " , actual size = "<< size << " , needed_size = " << input_block_size << std::endl;
@@ -100,7 +100,7 @@ namespace EvalIO
 				// memory to file
 				else if (in_.file_or_memory.memory() && out_.file_or_memory.file())
 				{
-					if (SystemIO::WriteMemoryToFile(out_.file_or_memory.filename, in_.file_or_memory.ptr, output_block_size).is_not_ok())
+					if (FileOperator::WriteMemoryToFile(out_.file_or_memory.filename, in_.file_or_memory.ptr, output_block_size).is_not_ok())
 					{
 						std::cout << "info string write file error , file = " << out_.file_or_memory.filename << std::endl;
 						return false;
@@ -149,8 +149,8 @@ namespace EvalIO
 					input_buffer.resize(input_block_size);
 					in_ptr = (void*)&input_buffer[0];
 
-					if (SystemIO::ReadFileToMemory(in_.file_or_memory.filename, [&](size_t file_size) {
-						if ((u64)file_size != input_block_size)
+					if (FileOperator::ReadFileToMemory(in_.file_or_memory.filename, [&](u64 file_size) {
+						if (file_size != input_block_size)
 						{
 							std::cout << "info string Error! file_size = " << file_size << " , input_block_size = " << input_block_size << std::endl;
 							return (void*)nullptr;
@@ -328,7 +328,7 @@ namespace EvalIO
 
 				if (out_.file_or_memory.ptr == nullptr)
 				{
-					if (SystemIO::WriteMemoryToFile(out_.file_or_memory.filename , out_ptr , output_block_size).is_not_ok())
+					if (FileOperator::WriteMemoryToFile(out_.file_or_memory.filename , out_ptr , output_block_size).is_not_ok())
 					{
 						std::cout << "info string write file error , file = " << out_.file_or_memory.filename << std::endl;
 						return false;

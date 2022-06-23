@@ -3,9 +3,7 @@
 
 // BonaPieceのmirror(左右反転)やinverse(盤上の180度回転)させた駒を得るためのツール類。
 
-#include "../config.h"
-#if defined(USE_EVAL_LIST)
-
+#include "../types.h"
 #include "../evaluate.h"
 #include <functional>
 
@@ -42,5 +40,4 @@ namespace Eval
 	extern void init_mir_inv_tables();
 }
 
-#endif // defined(USE_EVAL_LIST)
-#endif // _EVALUATE_MIR_INV_TOOLS_
+#endif

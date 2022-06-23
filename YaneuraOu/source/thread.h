@@ -71,14 +71,6 @@ public:
 	// 探索が終わるのを待機する。(searchingフラグがfalseになるのを待つ)
 	void wait_for_search_finished();
 
-	// Threadの自身のスレッド番号を返す。0 origin。
-	size_t id() const { return idx; }
-
-	// === やねうら王独自拡張 ===
-
-	// 探索中であるかを返す。
-	bool is_searching() const { return searching; }
-
 	// ------------------------------
 	//       探索に必要なもの
 	// ------------------------------
@@ -88,27 +80,20 @@ public:
 	// pvLast   : tbRank絡み。将棋では関係ないので用いない。
 	size_t pvIdx /*,pvLast*/;
 
-	//RunningAverage complexityAverage;
-	// →　やねうら王では導入せず
-
-	// nodes     : このスレッドが探索したノード数(≒Position::do_move()を呼び出した回数)
-	// bestMoveChanges : 反復深化においてbestMoveが変わった回数。nodeの安定性の指標として用いる。全スレ分集計して使う。
-	std::atomic<uint64_t> nodes,/* tbHits,*/ bestMoveChanges;
+	// 置換表に平均的にどれくらいhitしているかという統計情報
+	// これに基づき、枝刈りを調整する。
+	uint64_t ttHitAverage;
 
 	// selDepth  : rootから最大、何手目まで探索したか(選択深さの最大)
 	// nmpMinPly : null moveの前回の適用ply
 	// nmpColor  : null moveの前回の適用Color
-	// state     : 探索で組合せ爆発が起きているか等を示す状態
-	int selDepth, nmpMinPly;
+	int selDepth ,nmpMinPly;
 	Color nmpColor;
 
-	// bestValue :
-	// search()で、そのnodeでbestMoveを指したときの(探索の)評価値
-	// Stockfishではevaluate()の遅延評価のためにThreadクラスに持たせることになった。
-	// cf. Reduce use of lazyEval : https://github.com/official-stockfish/Stockfish/commit/7b278aab9f61620b9dba31896b38aeea1eb911e2
-	// optimism  : 楽観値
-	// → やねうら王では導入せず
-	Value bestValue /*, optimism[COLOR_NB]*/ ;
+	// nodes     : このスレッドが探索したノード数(≒Position::do_move()を呼び出した回数)
+ 	// bestMoveChanges : 反復深化においてbestMoveが変わった回数。nodeの安定性の指標として用いる。全スレ分集計して使う。
+	std::atomic<uint64_t> nodes,/* tbHits,*/ bestMoveChanges;
+
 
 	// 探索開始局面
 	Position rootPos;
@@ -123,22 +108,14 @@ public:
 
 	// rootDepth      : 反復深化の深さ
 	//					Lazy SMPなのでスレッドごとにこの変数を保有している。
-	//
+	// 
 	// completedDepth : このスレッドに関して、終了した反復深化の深さ
 	//
 	Depth rootDepth, completedDepth;
 
-#if defined(__EMSCRIPTEN__)
-	// yaneuraou.wasm
-	std::atomic_bool threadStarted;
-#endif
-
-	// aspiration searchのrootでの beta - alpha
-	Value rootDelta;
-
-#if defined(USE_MOVE_PICKER)
 	// 近代的なMovePickerではオーダリングのために、スレッドごとにhistoryとcounter movesなどのtableを持たないといけない。
 	CounterMoveHistory counterMoves;
+	LowPlyHistory lowPlyHistory;
 	ButterflyHistory mainHistory;
 	CapturePieceToHistory captureHistory;
 
@@ -148,15 +125,11 @@ public:
 	// →　この改造、レーティングがほぼ上がっていない。悪い改造のような気がする。
 	ContinuationHistory continuationHistory[2][2];
 
-#endif
-
 	// Stockfish10ではスレッドごとにcontemptを保持するように変わった。
 	//Score contempt;
 
-	// trendは千日手を受け入れるスコア。動的に変更する。(dynamic contempt)
-	// 勝ってるほうは千日手にはしたくないし、負けてるほうは千日手やむなしという…。
-	//Value trend;
-	// →　やねうら王ではこの値、使わないことにする。
+	// 反復深化のループで何度fail highしたかのカウンター
+	int failedHighCnt;
 
 	// ------------------------------
 	//   やねうら王、独自追加
@@ -173,7 +146,7 @@ public:
 #endif
 
 };
-
+  
 
 // 探索時のmainスレッド(これがmasterであり、これ以外はslaveとみなす)
 struct MainThread: public Thread
@@ -183,23 +156,16 @@ struct MainThread: public Thread
 
 	// 探索を開始する時に呼び出される。
 	void search() override;
-
-	// Thread::search()を呼び出す。
-	// ※　Stockfish、MainThreadがsearch()をoverrideする設計になっているの、良くないと思う。
-	//     そのため、MainThreadに対して外部からThread::search()を呼び出させることが出来ない。
-	//     仕方ないのでこれを回避するために抜け道を用意しておく。
-	void thread_search() { Thread::search(); }
-
+	
 	// 思考時間の終わりが来たかをチェックする。
 	void check_time();
 
 	// previousTimeReduction : 反復深化の前回のiteration時のtimeReductionの値。
 	double previousTimeReduction;
 
-	// 前回の探索時のスコアとその平均。
+	// 前回の探索時のスコア。
 	// 次回の探索のときに何らか使えるかも。
 	Value bestPreviousScore;
-	Value bestPreviousAverageScore;
 
 	// 時間まぎわのときに探索を終了させるかの判定に用いるための、
 	// 反復深化のiteration、前4回分のScore
@@ -227,18 +193,6 @@ struct MainThread: public Thread
 	// Stockfishは置換表からponder moveをひねり出すコードになっているが、
 	// 前回iteration時のPVの2手目の指し手で良いのではなかろうか…。
 	Move ponder_candidate;
-
-	// "Position"コマンドで1つ目に送られてきた文字列("startpos" or sfen文字列)
-	std::string game_root_sfen;
-
-	// "Position"コマンドで"moves"以降にあった、rootの局面からこの局面に至るまでの手順
-	std::vector<Move> moves_from_game_root;
-
-	// Stochastic Ponderのときに↑を2手前に戻すので元の"position"コマンドと"go"コマンドの文字列を保存しておく。
-	std::string last_position_cmd_string = "position startpos";
-	std::string last_go_cmd_string;
-	// Stochastic Ponderのために2手前に戻してしまっているかのフラグ
-	bool position_is_dirty = false;
 };
 
 
@@ -265,9 +219,6 @@ struct ThreadPool: public std::vector<Thread*>
 	MainThread* main() { return static_cast<MainThread*>(at(0)); }
 
 	// 今回、goコマンド以降に探索したノード数
-	// →　これはPosition::do_move()を呼び出した回数。
-	// ※　dlshogiエンジンで、探索ノード数が知りたい場合は、
-	// 　dlshogi::nodes_visited()を呼び出すこと。
 	uint64_t nodes_searched() { return accumulate(&Thread::nodes); }
 
 	// 探索終了時に、一番良い探索ができていたスレッドを選ぶ。
@@ -279,17 +230,11 @@ struct ThreadPool: public std::vector<Thread*>
 	// main threadがそれ以外の探索threadの終了を待つ。
 	void wait_for_search_finished() const;
 
-	// stop          : 探索中にこれがtrueになったら探索を即座に終了すること。
+	// stop   : 探索中にこれがtrueになったら探索を即座に終了すること。
 	// increaseDepth : 一定間隔ごとに反復深化の探索depthが増えて行っているかをチェックするためのフラグ
 	//                 増えて行ってないなら、同じ深さを再度探索するのに用いる。
 	std::atomic_bool stop , increaseDepth;
-
-	// === やねうら王独自拡張 ===
-
-	// main thread以外の探索スレッドがすべて終了しているか。
-	// すべて終了していればtrueが返る。
-	bool search_finished() const;
-
+	
 private:
 
 	// 現局面までのStateInfoのlist

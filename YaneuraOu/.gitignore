@@ -3,7 +3,7 @@
 
 # added by yaneurao
 
-# *.gitattributes
+*.gitattributes
 # *.gitignore
 *.bat
 *.rb
@@ -17,16 +17,6 @@ YaneuraOu_backup*.lnk
 *.vspx
 *~
 ~*
-.dl/
-.script/
-.vscode/
-docker/
-*.nnue
-*.nnue.*
-*.result.txt
-
-# embedded_nnue.cpp
-embedded_nnue.cpp
 
 # experimental
 
@@ -59,7 +49,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 exe/
-npmpackages/**/lib/*
 
 # Visual Studio 2015 cache/options directory
 .vs/

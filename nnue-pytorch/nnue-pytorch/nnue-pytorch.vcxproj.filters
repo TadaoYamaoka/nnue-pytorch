@@ -36,12 +36,6 @@
     <ClCompile Include="..\..\YaneuraOu\source\types.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\mate\mate.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\unit_test.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\eval\evaluate.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
@@ -49,9 +43,6 @@
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\eval\material\evaluate_material.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\mate\mate1ply_without_effect.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\misc.cpp">
@@ -66,13 +57,7 @@
     <ClCompile Include="..\..\YaneuraOu\source\tt.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\book\book.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\usi.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\book\apery_book.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\engine\yaneuraou-engine\yaneuraou-search.cpp">
@@ -82,24 +67,6 @@
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\movepick.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\normal_test_cmd.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\mate_test_cmd.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\mate\mate_solver.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\book\makebook.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\book\makebook2015.cpp">
-      <Filter>ソース ファイル\YaneuraOu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\book\makebook2019.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
     <ClCompile Include="..\..\YaneuraOu\source\learn\multi_think.cpp">
@@ -126,7 +93,31 @@
     <ClCompile Include="..\..\YaneuraOu\source\eval\evaluate_mir_inv_tools.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\benchmark.cpp">
+    <ClCompile Include="..\..\YaneuraOu\source\extra\mate\mate_n_ply.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\extra\mate\mate1ply_with_effect.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\extra\mate\mate1ply_without_effect.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\extra\book\apery_book.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\extra\book\book.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\extra\book\makebook2019.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\extra\test_cmd.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\benchmark.cpp">
+      <Filter>ソース ファイル\YaneuraOu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\YaneuraOu\source\eval\nnue\nnue_test_command.cpp">
       <Filter>ソース ファイル\YaneuraOu</Filter>
     </ClCompile>
   </ItemGroup>

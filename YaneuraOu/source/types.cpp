@@ -30,21 +30,20 @@ std::string pretty(Rank r) { return pretty_jp ? std::string("一二三四五六�
 std::string pretty(Move m)
 {
 	if (is_drop(m))
-		return pretty(to_sq(m)  ) + pretty2(Piece(from_sq(m))) + (pretty_jp ? "打" : "*");
+		return (pretty(move_to(m)) + pretty2(Piece(move_from(m))) + (pretty_jp ? "打" : "*"));
 	else
-		return pretty(from_sq(m)) + pretty(to_sq(m))           + (is_promote(m) ? (pretty_jp ? "成" : "+") : "");
+		return pretty(move_from(m)) + pretty(move_to(m)) + (is_promote(m) ? (pretty_jp ? "成" : "+") : "");
 }
 
 std::string pretty(Move m, Piece movedPieceType)
 {
 	if (is_drop(m))
-		return pretty(to_sq(m)) + pretty2(movedPieceType) + (pretty_jp ? "打" : "*");
+		return (pretty(move_to(m)) + pretty2(movedPieceType) + (pretty_jp ? "打" : "*"));
 	else
-		return pretty(to_sq(m)) + pretty2(movedPieceType) + (is_promote(m) ? (pretty_jp ? "成" : "+") : "") + "[" + pretty(from_sq(m)) + "]";
+		return pretty(move_to(m)) + pretty2(movedPieceType) + (is_promote(m) ? (pretty_jp ? "成" : "+") : "") + "[" + pretty(move_from(m)) + "]";
 }
 
-std::string to_usi_string(Move   m){ return USI::move(m); }
-std::string to_usi_string(Move16 m){ return USI::move(m); }
+std::string to_usi_string(Move m){ return USI::move(m); }
 
 std::ostream& operator<<(std::ostream& os, Color c) { os << ((c == BLACK) ? (pretty_jp ? "先手" : "BLACK") : (pretty_jp ? "後手" : "WHITE")); return os; }
 
@@ -67,7 +66,7 @@ std::ostream& operator<<(std::ostream& os, Hand hand)
 			// 1枚なら枚数は出力しない。2枚以上なら枚数を最初に出力
 			// PRETTY_JPが指定されているときは、枚数は後ろに表示。
 			const std::string cs = (c != 1) ? std::to_string(c) : "";
-			os << (pretty_jp ? "" : cs) << pretty(pr) << (pretty_jp ? cs : "");
+			std::cout << (pretty_jp ? "" : cs) << pretty(pr) << (pretty_jp ? cs : "");
 		}
 	}
 	return os;
@@ -119,7 +118,7 @@ namespace Search {
 			return false;
 
 		pos.do_move(pv[0], st, pos.gives_check(pv[0]));
-		TTEntry* tte = TT.read_probe(pos.state()->hash_key(), ttHit);
+		TTEntry* tte = TT.read_probe(pos.state()->key(), ttHit);
 		Move m;
 		if (ttHit)
 		{
@@ -156,3 +155,4 @@ Value drawValueTable[REPETITION_NB][COLOR_NB] =
 #if defined(USE_GLOBAL_OPTIONS)
 GlobalOptions_ GlobalOptions;
 #endif
+

@@ -9,31 +9,20 @@
 
 namespace {
 
-	// これぐらい自分が指すと終局すると考えて計画を練る。
-	// 近年、将棋ソフトは終局までの平均手数が伸びているので 160に設定しておく。
-	const int MoveHorizon = 160;
+  // これぐらい自分が指すと終局すると考えて計画を練る。
+  const int MoveHorizon = 80;
 
-	// 思考時間のrtimeが指定されたときに用いる乱数
-	PRNG prng;
+  // 思考時間のrtimeが指定されたときに用いる乱数
+  PRNG prng;
 
 } // namespace
 
-
-void Timer::init(const Search::LimitsType& limits, Color us, int ply)
-{
-	// reinit()が呼び出された時のために呼び出し条件を保存しておく。
-	lastcall_Limits = const_cast<Search::LimitsType*>(&limits);
-	lastcall_Us     = us;
-	lastcall_Ply    = ply;
-
-	init_(limits, us, ply);
-}
 
 // 今回の思考時間を計算して、optimum(),maximum()が値をきちんと返せるようにする。
 // これは探索の開始時に呼び出されて、今回の指し手のための思考時間を計算する。
 // limitsで指定された条件に基いてうまく計算する。
 // ply : ここまでの手数。平手の初期局面なら1。(0ではない)
-void Timer::init_(const Search::LimitsType& limits, Color us, int ply)
+void Timer::init(Search::LimitsType& limits, Color us, int ply)
 {
 #if 0
 	// nodes as timeモード
@@ -72,8 +61,7 @@ void Timer::init_(const Search::LimitsType& limits, Color us, int ply)
 	search_end = 0;
 
 	// 今回の最大残り時間(これを超えてはならない)
-	// byoyomiとincの指定は残り時間にこの時点で加算して考える。
-	remain_time = limits.time[us] + limits.byoyomi[us] + limits.inc[us] - (TimePoint)Options["NetworkDelay2"];
+	remain_time = limits.time[us] + limits.byoyomi[us] - (TimePoint)Options["NetworkDelay2"];
 	// ここを0にすると時間切れのあと自爆するのでとりあえず100にしておく。
 	remain_time = std::max(remain_time, (TimePoint)100);
 
@@ -99,14 +87,6 @@ void Timer::init_(const Search::LimitsType& limits, Color us, int ply)
 #endif
 
 		remain_time = minimumTime = optimumTime = maximumTime = r;
-		return;
-	}
-
-	// 時間固定モード
-	// "go movetime 100"のようにして思考をさせた場合。
-	if (limits.movetime)
-	{
-		remain_time = minimumTime = optimumTime = maximumTime = limits.movetime;
 		return;
 	}
 
@@ -159,15 +139,7 @@ void Timer::init_(const Search::LimitsType& limits, Color us, int ply)
 		TimePoint t1 = minimumTime + remain_estimate / MTG;
 
 		// -- maximumTime
-		//float max_ratio = 5.0f;
-#if !defined(YANEURAOU_ENGINE_DEEP)
-		float max_ratio = 3.0f;
-		// 5.0f、やりすぎな気がする。時間使いすぎて他のところで足りなくなる。
-#else
-		// ふかうら王、5.0fでもうまくマネージメントできるんじゃないか？(根拠なし。計測すべき)
 		float max_ratio = 5.0f;
-#endif
-
 
 		// 切れ負けルールにおいては、5分を切っていたら、このratioを抑制する。
 		if (limits.inc[us] == 0 && limits.byoyomi[us] == 0)
@@ -187,13 +159,10 @@ void Timer::init_(const Search::LimitsType& limits, Color us, int ply)
 		optimumTime = std::min(t1, optimumTime) * slowMover / 100;
 		maximumTime = std::min(t2, maximumTime);
 
-#if !defined(YANEURAOU_ENGINE_DEEP)
 		// Ponderが有効になっている場合、ponderhitすると時間が本来の予測より余っていくので思考時間を心持ち多めにとっておく。
 		// これ本当はゲーム開始時にUSIコマンドで送られてくるべきだと思う。→　将棋所では、送られてきてた。"USI_Ponder"  [2019/04/29]
-		// ふかうら王の場合、Ponder当たったからと言って探索量減らさないし、Stochastic Ponderがあるから、まあこれはいいや…。
 		if (/* Threads.main()->received_go_ponder*/ Options["USI_Ponder"])
 			optimumTime += optimumTime / 4;
-#endif
 	}
 
 	// 秒読みモードでかつ、持ち時間がないなら、最小思考時間も最大思考時間もその時間にしたほうが得

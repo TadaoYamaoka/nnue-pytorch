@@ -1,17 +1,11 @@
 Param(
-  [String[]]$Edition,
-  [String]$Extra
+  [String[]]$Edition
 )
 Push-Location (Join-Path $PSScriptRoot ..);
 @(
   @{
     EDITION = "YANEURAOU_ENGINE_NNUE";
     Dir = ".\build\android\NNUE";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32";
-    Nnue = "HALFKP_VM";
-    Dir = ".\build\android\NNUE_HALFKP_VM";
   };
   @{
     EDITION = "YANEURAOU_ENGINE_NNUE_HALFKPE9";
@@ -33,53 +27,11 @@ Push-Location (Join-Path $PSScriptRoot ..);
   };
   @{
     EDITION = "YANEURAOU_ENGINE_MATERIAL";
-    Dir = ".\build\android\MaterialLv1";
+    Dir = ".\build\android\KOMA";
   };
   @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=2";
-    Dir = ".\build\android\MaterialLv2";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=3";
-    Dir = ".\build\android\MaterialLv3";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=4";
-    Dir = ".\build\android\MaterialLv4";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=5";
-    Dir = ".\build\android\MaterialLv5";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=6";
-    Dir = ".\build\android\MaterialLv6";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=7";
-    Dir = ".\build\android\MaterialLv7";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=8";
-    Dir = ".\build\android\MaterialLv8";
-  };
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=9";
-    Dir = ".\build\android\MaterialLv9";
-  };
-<#
-  @{
-    EDITION = "YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=10";
-    Dir = ".\build\android\MaterialLv10";
-  };
-#>
-  @{
-    EDITION = "YANEURAOU_MATE_ENGINE";
-    Dir = ".\build\android\YaneuraOu_MATE";
-  };
-  @{
-    EDITION = "TANUKI_MATE_ENGINE";
-    Dir = ".\build\android\tanuki_MATE";
+    EDITION = "MATE_ENGINE";
+    Dir = ".\build\android\MATE";
   };
   @{
     EDITION = "USER_ENGINE";
@@ -106,11 +58,11 @@ if(-not (Test-Path $Dir)){
 }
 
 "`n* Clean Build"|Out-Host;
-ndk-build.cmd clean YANEURAOU_EDITION=$_Edition $Extra;
+ndk-build.cmd clean YANEURAOU_EDITION=$_Edition;
 
 "`n* Build Binary"|Out-Host;
 $log = $null;
-ndk-build.cmd -j $Jobs YANEURAOU_EDITION=$_Edition NNUE_EVAL_ARCH=$($_.Nnue) V=1 $Extra|Tee-Object -Variable log;
+ndk-build.cmd YANEURAOU_EDITION=$_Edition NNUE_EVAL_ARCH=$($_.Nnue) V=1 -j $Jobs|Tee-Object -Variable log;
 $log|Out-File -Encoding utf8 -Force (Join-Path $Dir "build.log");
 
 "`n* Copy Binary"|Out-Host;
@@ -120,7 +72,7 @@ ForEach-Object{
 };
 
 "`n* Clean Build"|Out-Host;
-ndk-build.cmd clean YANEURAOU_EDITION=$_Edition $Extra;
+ndk-build.cmd clean YANEURAOU_EDITION=$_Edition;
 
 }
 

@@ -20,12 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\training_data_loader.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\benchmark.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\bitboard.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\book\apery_book.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\book\book.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\book\makebook.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\book\makebook2015.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\book\makebook2019.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\engine\yaneuraou-engine\yaneuraou-search.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\eval\evaluate.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\eval\evaluate_bona_piece.cpp" />
@@ -35,21 +31,22 @@
     <ClCompile Include="..\..\YaneuraOu\source\eval\nnue\evaluate_nnue_learner.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\eval\nnue\features\half_kp.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\eval\nnue\features\half_relative_kp.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\eval\nnue\nnue_test_command.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\book\apery_book.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\book\book.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\book\makebook2019.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\mate\mate1ply_without_effect.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\mate\mate1ply_with_effect.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\mate\mate_n_ply.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\extra\sfen_packer.cpp" />
+    <ClCompile Include="..\..\YaneuraOu\source\extra\test_cmd.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\learn\learner.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\learn\learning_tools.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\learn\multi_think.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\mate\mate.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\mate\mate1ply_without_effect.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\mate\mate_solver.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\misc.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\movegen.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\movepick.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\position.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\benchmark.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\mate_test_cmd.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\normal_test_cmd.cpp" />
-    <ClCompile Include="..\..\YaneuraOu\source\testcmd\unit_test.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\thread.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\timeman.cpp" />
     <ClCompile Include="..\..\YaneuraOu\source\tt.cpp" />
@@ -79,7 +76,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

@@ -1,5 +1,4 @@
 ﻿#include "evaluate_mir_inv_tools.h"
-#if defined(USE_EVAL_LIST)
 
 namespace Eval
 {
@@ -196,4 +195,3 @@ namespace Eval
 	}
 
 }
-#endif // defined(USE_EVAL_LIST)

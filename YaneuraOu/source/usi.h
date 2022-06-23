@@ -6,12 +6,11 @@
 #include <vector>
 #include <functional>	// function
 
-#include "types.h"
-#include "position.h"
-
 // --------------------
 //     USI関連
 // --------------------
+
+class Position;
 
 namespace USI
 {
@@ -78,11 +77,6 @@ namespace USI
 		// コマンド文字列からOptionのインスタンスを構築する時にこの機能が必要となる。
 		void overwrite(const Option&);
 
-		// 既存のOptionの上書き。
-		// min = max = default = param になる。
-		void overwrite(const std::string& param);
-
-
 	private:
 		friend std::ostream& operator<<(std::ostream& os, const OptionsMap& om);
 
@@ -108,35 +102,25 @@ namespace USI
 	// USIメッセージ応答部(起動時に、各種初期化のあとに呼び出される)
 	void loop(int argc, char* argv[]);
 
-#if defined(USE_PIECE_VALUE)
 	// USIプロトコルの形式でValue型を出力する。
 	// 歩が100になるように正規化するので、operator <<(Value)をこういう仕様にすると
 	// 実際の値と異なる表示になりデバッグがしにくくなるから、そうはしていない。
-	// USE_PIECE_VALUEが定義されていない時は正規化しようがないのでこの関数は呼び出せない。
 	std::string value(Value v);
-#endif
 
 	// Square型をUSI文字列に変換する
 	std::string square(Square s);
 
 	// 指し手をUSI文字列に変換する。
-	std::string move(Move   m /*, bool chess960*/);
-	std::string move(Move16 m /*, bool chess960*/);
-
-	// 読み筋をUSI文字列化して返す。
-	// " 7g7f 8c8d" のように返る。
-	std::string move(const std::vector<Move>& moves);
+	std::string move(Move m /*, bool chess960*/);
 
 	// pv(読み筋)をUSIプロトコルに基いて出力する。
 	// depth : 反復深化のiteration深さ。
 	std::string pv(const Position& pos, Depth depth, Value alpha, Value beta);
 
 	// 局面posとUSIプロトコルによる指し手を与えて
-	// もし可能なら等価で合法な指し手を返す。
-	// 合法でないときはMOVE_NONEを返す。(この時、エラーである旨を出力する。)
-	// "resign"に対してはMOVE_RESIGNを返す。
+	// もし可能なら等価で合法な指し手を返す。(合法でないときはMOVE_NONEを返す。"resign"に対してはMOVE_RESIGNを返す。)
 	// Stockfishでは第二引数にconstがついていないが、これはつけておく。
-	// 32bit Moveが返る。(Move16ではないことに注意)
+	// 32bit Moveが返る。
 	Move to_move(const Position& pos, const std::string& str);
 
 	// -- 以下、やねうら王、独自拡張。
@@ -162,34 +146,15 @@ namespace USI
 	extern EnteringKingRule to_entering_king_rule(const std::string& rule);
 #endif
 
-	// エンジンオプションをコンパイル時に設定する機能
-	// "ENGINE_OPTIONS"で指定した内容を設定する。
-	// 例) #define ENGINE_OPTIONS "FV_SCALE=24;BookFile=no_book"
-	extern void set_engine_options(const std::string& options);
-
-	// エンジンオプションのoverrideのためにファイルから設定を読み込む。
-	// 1) これは起動時に"engine_options.txt"という設定ファイルを読み込むのに用いる。
-	// 2) "isready"応答に対して、EvalDirのなかにある"eval_options.txt"という設定ファイルを読み込むのにも用いる。
-	extern void read_engine_options(const std::string& filename);
-
-	// namespace USI内のUnitTest。
-	extern void UnitTest(Test::UnitTester& tester);
 }
 
 // USIのoption設定はここに保持されている。
 extern USI::OptionsMap Options;
 
-// === やねうら王独自実装 ===
-
 // USIの"isready"コマンドが呼び出されたときの処理。このときに評価関数の読み込みなどを行なう。
 // benchmarkコマンドのハンドラなどで"isready"が来ていないときに評価関数を読み込ませたいときに用いる。
 // skipCorruptCheck == trueのときは評価関数の2度目の読み込みのときのcheck sumによるメモリ破損チェックを省略する。
 // ※　この関数は、Stockfishにはないがないと不便なので追加しておく。
-extern void is_ready(bool skipCorruptCheck = false);
-
-// positionコマンドのparserを呼び出したいことがあるので外部から呼び出せるようにしておく。
-// 使い方はbenchコマンド(benchmark.cpp)のコードを見てほしい。
-extern void position_cmd(Position& pos, std::istringstream& is, StateListPtr& states);
-
+void is_ready(bool skipCorruptCheck = false);
 
 #endif // #ifndef USI_H_INCLUDED

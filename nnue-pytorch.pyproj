@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{21a4bd97-2d88-41a4-9611-d62ddb76bea6}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>train.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>CondaEnv|CondaEnv|nnue-pytorch</InterpreterId>
+    <CommandLineArguments>F:\floodgate\floodgate_2019-2021_r3500_nomate.psv.bin F:\floodgate\floodgate_test_2017-2018_r3500_eval5000.psv.bin --gpus 1</CommandLineArguments>
+    <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
+    <IsWindowsApplication>False</IsWindowsApplication>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|env" />
+    <InterpreterReference Include="CondaEnv|CondaEnv|nnue-pytorch" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="cross_check_eval.py" />
+    <Compile Include="delete_bad_nets.py" />
+    <Compile Include="do_plots.py" />
+    <Compile Include="features.py" />
+    <Compile Include="feature_block.py" />
+    <Compile Include="feature_set.py" />
+    <Compile Include="halfka.py" />
+    <Compile Include="halfkp.py" />
+    <Compile Include="metrics.py" />
+    <Compile Include="model.py" />
+    <Compile Include="nnue_bin_dataset.py" />
+    <Compile Include="nnue_dataset.py" />
+    <Compile Include="perf_sigmoid_fitter.py" />
+    <Compile Include="qmodel.py" />
+    <Compile Include="quantize.py" />
+    <Compile Include="ranger.py" />
+    <Compile Include="run_games.py" />
+    <Compile Include="serialize.py" />
+    <Compile Include="test_shared_library.py" />
+    <Compile Include="train.py" />
+    <Compile Include="visualize.py" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

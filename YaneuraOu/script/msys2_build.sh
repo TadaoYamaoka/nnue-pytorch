@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 # MSYS2 (MinGW 64-bit) 上で Windows バイナリのビルド
 # ビルド用パッケージの導入
-# $ pacman --needed --noconfirm -Syuu
-# $ pacman --needed --noconfirm -Syuu pactoys
-# $ pacboy --needed --noconfirm -Syuu clang:m lld:m openblas:x openmp:x toolchain:m base-devel:
-# MSYS2パッケージの更新、更新出来る項目が無くなるまで繰り返し実行、場合によってはMSYS2の再起動が必要
+# $ pacboy --needed --noconfirm -Syuu toolchain:m clang:m openblas:m base-devel: msys2-devel:
+# MSYS2パッケージの更新、更新出来る項目が無くなるまで繰り返し実行、場合によってはMinGWの再起動が必要
 # $ pacman -Syuu --noconfirm
 
 # Example 1: 全パターンのビルド
@@ -20,25 +18,22 @@
 OS=Windows_NT
 MAKE=mingw32-make
 MAKEFILE=Makefile
+JOBS=`grep -c ^processor /proc/cpuinfo 2>/dev/null`
 
-ARCHCPUS='*'
 COMPILERS="clang++,g++"
 EDITIONS='*'
 TARGETS='*'
-EXTRA=''
 
-while getopts a:c:e:t:x: OPT
+while getopts c:e:t: OPT
 do
   case $OPT in
-    a) ARCHCPUS="$OPTARG"
-      ;;
     c) COMPILERS="$OPTARG"
       ;;
     e) EDITIONS="$OPTARG"
       ;;
     t) TARGETS="$OPTARG"
       ;;
-    x) EXTRA="$OPTARG"
+    p) CPUS="$OPTARG"
       ;;
   esac
 done
@@ -46,7 +41,7 @@ done
 set -f
 IFS=, eval 'COMPILERSARR=($COMPILERS)'
 IFS=, eval 'EDITIONSARR=($EDITIONS)'
-IFS=, eval 'ARCHCPUSARR=($ARCHCPUS)'
+IFS=, eval 'CPUSARR=($CPUS)'
 IFS=, eval 'TARGETSARR=($TARGETS)'
 
 pushd `dirname $0`
@@ -54,23 +49,12 @@ pushd ../source
 
 EDITIONS=(
   YANEURAOU_ENGINE_NNUE
-  YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32
   YANEURAOU_ENGINE_NNUE_HALFKPE9
   YANEURAOU_ENGINE_NNUE_KP256
   YANEURAOU_ENGINE_KPPT
   YANEURAOU_ENGINE_KPP_KKPT
   YANEURAOU_ENGINE_MATERIAL
-  YANEURAOU_ENGINE_MATERIAL2
-  YANEURAOU_ENGINE_MATERIAL3
-  YANEURAOU_ENGINE_MATERIAL4
-  YANEURAOU_ENGINE_MATERIAL5
-  YANEURAOU_ENGINE_MATERIAL6
-  YANEURAOU_ENGINE_MATERIAL7
-  YANEURAOU_ENGINE_MATERIAL8
-  YANEURAOU_ENGINE_MATERIAL9
-#  YANEURAOU_ENGINE_MATERIAL10
-  YANEURAOU_MATE_ENGINE
-  TANUKI_MATE_ENGINE
+  MATE_ENGINE
   USER_ENGINE
 )
 
@@ -78,9 +62,10 @@ TARGETS=(
   normal
   tournament
   evallearn
+  gensfen
 )
 
-ARCHCPUS=(
+CPUS=(
   ZEN3
   ZEN2
   ZEN1
@@ -95,72 +80,26 @@ ARCHCPUS=(
   OTHER
 )
 
-declare -A EDITIONSTR;
-EDITIONSTR=(
-  ["YANEURAOU_ENGINE_NNUE"]="YANEURAOU_ENGINE_NNUE"
-  ["YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32"]="YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32"
-  ["YANEURAOU_ENGINE_NNUE_HALFKPE9"]="YANEURAOU_ENGINE_NNUE_HALFKPE9"
-  ["YANEURAOU_ENGINE_NNUE_KP256"]="YANEURAOU_ENGINE_NNUE_KP256"
-  ["YANEURAOU_ENGINE_KPPT"]="YANEURAOU_ENGINE_KPPT"
-  ["YANEURAOU_ENGINE_KPP_KKPT"]="YANEURAOU_ENGINE_KPP_KKPT"
-  ["YANEURAOU_ENGINE_MATERIAL"]="YANEURAOU_ENGINE_MATERIAL"
-  ["YANEURAOU_ENGINE_MATERIAL2"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=2"
-  ["YANEURAOU_ENGINE_MATERIAL3"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=3"
-  ["YANEURAOU_ENGINE_MATERIAL4"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=4"
-  ["YANEURAOU_ENGINE_MATERIAL5"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=5"
-  ["YANEURAOU_ENGINE_MATERIAL6"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=6"
-  ["YANEURAOU_ENGINE_MATERIAL7"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=7"
-  ["YANEURAOU_ENGINE_MATERIAL8"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=8"
-  ["YANEURAOU_ENGINE_MATERIAL9"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=9"
-  ["YANEURAOU_ENGINE_MATERIAL10"]="YANEURAOU_ENGINE_MATERIAL MATERIAL_LEVEL=10"
-  ["YANEURAOU_MATE_ENGINE"]="YANEURAOU_MATE_ENGINE"
-  ["TANUKI_MATE_ENGINE"]="TANUKI_MATE_ENGINE"
-  ["USER_ENGINE"]="USER_ENGINE"
-);
-
 declare -A DIRSTR;
 DIRSTR=(
   ["YANEURAOU_ENGINE_NNUE"]="NNUE"
-  ["YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32"]="NNUE_HalfKP_VM"
   ["YANEURAOU_ENGINE_NNUE_HALFKPE9"]="NNUE_HALFKPE9"
   ["YANEURAOU_ENGINE_NNUE_KP256"]="NNUE_KP256"
   ["YANEURAOU_ENGINE_KPPT"]="KPPT"
   ["YANEURAOU_ENGINE_KPP_KKPT"]="KPP_KKPT"
-  ["YANEURAOU_ENGINE_MATERIAL"]="MaterialLv1"
-  ["YANEURAOU_ENGINE_MATERIAL2"]="MaterialLv2"
-  ["YANEURAOU_ENGINE_MATERIAL3"]="MaterialLv3"
-  ["YANEURAOU_ENGINE_MATERIAL4"]="MaterialLv4"
-  ["YANEURAOU_ENGINE_MATERIAL5"]="MaterialLv5"
-  ["YANEURAOU_ENGINE_MATERIAL6"]="MaterialLv6"
-  ["YANEURAOU_ENGINE_MATERIAL7"]="MaterialLv7"
-  ["YANEURAOU_ENGINE_MATERIAL8"]="MaterialLv8"
-  ["YANEURAOU_ENGINE_MATERIAL9"]="MaterialLv9"
-  ["YANEURAOU_ENGINE_MATERIAL10"]="MaterialLv10"
-  ["YANEURAOU_MATE_ENGINE"]="YaneuraOu_MATE"
-  ["TANUKI_MATE_ENGINE"]="tanuki_MATE"
-  ["USER_ENGINE"]="USER"
+  ["YANEURAOU_ENGINE_MATERIAL"]="KOMA"
+  ["MATE_ENGINE"]="MATE"
 );
 
 declare -A FILESTR;
 FILESTR=(
   ["YANEURAOU_ENGINE_NNUE"]="YaneuraOu_NNUE"
-  ["YANEURAOU_ENGINE_NNUE_HALFKP_VM_256X2_32_32"]="YaneuraOu_NNUE_HalfKP_VM"
-  ["YANEURAOU_ENGINE_NNUE_HALFKPE9"]="YaneuraOu_NNUE_HalfKPE9"
+  ["YANEURAOU_ENGINE_NNUE_HALFKPE9"]="YaneuraOu_NNUE_KPE9"
   ["YANEURAOU_ENGINE_NNUE_KP256"]="YaneuraOu_NNUE_KP256"
   ["YANEURAOU_ENGINE_KPPT"]="YaneuraOu_KPPT"
   ["YANEURAOU_ENGINE_KPP_KKPT"]="YaneuraOu_KPP_KKPT"
-  ["YANEURAOU_ENGINE_MATERIAL"]="YaneuraOu_MaterialLv1"
-  ["YANEURAOU_ENGINE_MATERIAL2"]="YaneuraOu_MaterialLv2"
-  ["YANEURAOU_ENGINE_MATERIAL3"]="YaneuraOu_MaterialLv3"
-  ["YANEURAOU_ENGINE_MATERIAL4"]="YaneuraOu_MaterialLv4"
-  ["YANEURAOU_ENGINE_MATERIAL5"]="YaneuraOu_MaterialLv5"
-  ["YANEURAOU_ENGINE_MATERIAL6"]="YaneuraOu_MaterialLv6"
-  ["YANEURAOU_ENGINE_MATERIAL7"]="YaneuraOu_MaterialLv7"
-  ["YANEURAOU_ENGINE_MATERIAL8"]="YaneuraOu_MaterialLv8"
-  ["YANEURAOU_ENGINE_MATERIAL9"]="YaneuraOu_MaterialLv9"
-  ["YANEURAOU_ENGINE_MATERIAL10"]="YaneuraOu_MaterialLv10"
-  ["YANEURAOU_MATE_ENGINE"]="YaneuraOu_MATE"
-  ["TANUKI_MATE_ENGINE"]="tanuki_MATE"
+  ["YANEURAOU_ENGINE_MATERIAL"]="YaneuraOu_KOMA"
+  ["MATE_ENGINE"]="tanuki_MATE"
   ["USER_ENGINE"]="user"
 );
 
@@ -182,17 +121,15 @@ for COMPILER in ${COMPILERSARR[@]}; do
             set +f
             if [[ $TARGET == $TARGETPTN ]]; then
               set -f
-              echo "* target: ${TARGET}"
-              for ARCHCPU in ${ARCHCPUS[@]}; do
-                for ARCHCPUSPTN in ${ARCHCPUSARR[@]}; do
+              for CPU in ${CPUS[@]}; do
+                for CPUPTN in ${CPUSARR[@]}; do
                   set +f
-                  if [[ $ARCHCPU == $ARCHCPUSPTN ]]; then
-                    echo "* cpu: ${CPU}"
+                  if [[ $CPU == $CPUPTN ]]; then
+                    echo "* target: ${TARGET}"
                     TGSTR=${FILESTR[$EDITION]}-msys2-${CSTR}-${TARGET}
-                    ${MAKE} -f ${MAKEFILE} clean YANEURAOU_EDITION=${EDITIONSTR[$EDITION]} ${EXTRA}
-                    nice ${MAKE} -f ${MAKEFILE} -j$(nproc) ${TARGET} YANEURAOU_EDITION=${EDITIONSTR[$EDITION]} COMPILER=${COMPILER} TARGET_CPU=${ARCHCPU} ${EXTRA} >& >(tee ${BUILDDIR}/${TGSTR}.log) || exit $?
+                    ${MAKE} -f ${MAKEFILE} clean YANEURAOU_EDITION=${EDITION}
+                    nice ${MAKE} -f ${MAKEFILE} -j${JOBS} ${TARGET} YANEURAOU_EDITION=${EDITION} COMPILER=${COMPILER} TARGET_CPU=${CPU} > >(tee ${BUILDDIR}/${TGSTR}.log) || exit $?
                     cp YaneuraOu-by-gcc.exe ${BUILDDIR}/${TGSTR}.exe
-                    ${MAKE} -f ${MAKEFILE} clean YANEURAOU_EDITION=${EDITIONSTR[$EDITION]} ${EXTRA}
                     set -f
                     break
                   fi
@@ -204,6 +141,7 @@ for COMPILER in ${COMPILERSARR[@]}; do
             set -f
           done
         done
+        ${MAKE} -f ${MAKEFILE} clean YANEURAOU_EDITION=${EDITION}
         break
       fi
       set -f
