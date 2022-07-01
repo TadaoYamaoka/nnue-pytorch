@@ -132,14 +132,15 @@ namespace training_data {
 #ifdef _MSC_VER
                     concurrency::parallel_for(size_t(0), n, [&vec, this](size_t i)
                         {
-                            vec[i] = packedSfenValueToTrainingDataEntry(m_data[m_indexes[m_curr++]]);
+                            vec[i] = packedSfenValueToTrainingDataEntry(m_data[m_indexes[m_curr + i]]);
                         });
 #else
                     for (size_t i = 0; i < n; i++)
                     {
-                        vec[i] = packedSfenValueToTrainingDataEntry(m_data[m_indexes[m_curr++]]);
+                        vec[i] = packedSfenValueToTrainingDataEntry(m_data[m_indexes[m_curr + i]]);
                     }
 #endif
+                    m_curr += n;
                     return;
                 }
                 else
@@ -178,7 +179,7 @@ namespace training_data {
         std::vector<Learner::PackedSfenValue> m_data;
         std::vector<unsigned int> m_indexes;
         std::mt19937_64 m_engine;
-        unsigned int m_curr;
+        std::size_t m_curr;
     };
 
     inline std::unique_ptr<BasicSfenInputStream> open_sfen_input_file(const std::string& filename, bool cyclic, std::function<bool(const TrainingDataEntry&)> skipPredicate = nullptr)
